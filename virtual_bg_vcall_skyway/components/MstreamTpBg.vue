@@ -54,6 +54,7 @@ export default {
     }
   },
   created() {
+    console.log('this.$config', this.$config)
     this.peer = new Peer({
       key: this.$config.SKYWAY_API_KEY,
       debug: 3,
