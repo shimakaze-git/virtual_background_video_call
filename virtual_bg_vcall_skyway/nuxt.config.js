@@ -46,4 +46,3 @@ export default {
     fallback: true,
   },
 }
-console.log('process.env.SKYWAY_API_KEY', process.env)
