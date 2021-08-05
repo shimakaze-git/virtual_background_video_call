@@ -1,7 +1,17 @@
 <template>
   <div>
     <h1>仮想の背景をMediaStreamTrackProcessorで実装する</h1>
+    <h2>（requestAnimationFrame）</h2>
     <div>
+      <video
+        id="videoTag"
+        ref="videoTag"
+        width="240px"
+        height="120px"
+        autoplay
+        muted
+        playsinline
+      />
       <div class="canvas-container">
         <!-- canvasタグを非表示にしておく. -->
         <canvas
@@ -38,13 +48,15 @@
     />
   </div>
 </template>
-
 <script>
 import Peer from 'skyway-js'
 
 export default {
   data() {
     return {
+      prevTime: null,
+      videoTag: null,
+
       localMediaStream: null,
       selfieSegmentationInstance: null,
       segmentedLocalMediaStream: null,
@@ -94,6 +106,7 @@ export default {
       )
       this.setEventListener(mediaConnection)
     },
+
     setEventListener(mediaConnection) {
       mediaConnection.on('stream', (stream) => {
         // video要素にカメラ映像をセットして再生
@@ -102,6 +115,7 @@ export default {
         videoElm.play()
       })
     },
+
     async setSelfieSegmentation() {
       // @mediapipe/selfie_segmentationをCDNとして読み込む
       const scriptEl = await document.createElement('script')
@@ -179,32 +193,42 @@ export default {
     },
 
     // 描画の開始処理
-    async executeDraw() {
-      window.selfieSegmentationInstance = this.selfieSegmentationInstance
-      if ('MediaStreamTrackProcessor' in window) {
-        const processor = await new window.MediaStreamTrackProcessor(
-          this.localMediaStream.getVideoTracks()[0]
-        )
-        const writable = await new WritableStream({
-          // start() {},
-          async write(videoFrame) {
-            const imageBitmap = await createImageBitmap(videoFrame)
-            await window.selfieSegmentationInstance.send({ image: imageBitmap })
-            imageBitmap.close()
-            videoFrame.close()
-          },
-          // stop() {},
-        })
-        processor.readable.pipeTo(writable)
+    executeDraw() {
+      //   await new Promise((resolve, reject) => {
+      //     setTimeout(resolve, 500)
+      //   })
+
+      this.videoTag = this.$refs.videoTag
+      this.videoTag.srcObject = this.localMediaStream
+      this.videoTag.play()
+
+      this.prevTime = Date.now()
+      window.requestAnimationFrame(this.drawImage)
+    },
+
+    // 実際の描画処理を行う.
+    async drawImage() {
+      if (Date.now() - this.prevTime > 30) {
+        // if (Date.now() - this.prevTime > 60) {
+        this.prevTime = Date.now()
+        if (this.videoTag.currentTime !== 0) {
+          const imageBitMap = await createImageBitmap(this.videoTag)
+          //   console.log('imageBitMap', imageBitMap)
+          //   console.log('selfieSegmentation', this.selfieSegmentationInstance)
+          await this.selfieSegmentationInstance.send({ image: imageBitMap })
+        }
       }
+      window.requestAnimationFrame(this.drawImage)
     },
   },
 }
 </script>
-
 <style scoped>
-/* canvasタグを非表示にしておく. */
-#output_canvas {
+#videoTag {
+  display: none;
+}
+
+#output_canvas_video {
   display: none;
 }
 </style>

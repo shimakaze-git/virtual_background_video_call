@@ -1,32 +1,23 @@
 <template>
   <div class="container">
     <div>
-      <h1 class="subtitle">バーチャル背景の実装</h1>
-      <ul>
-        <!-- 仮想の背景をMediaStreamTrackProcessorで実装する -->
-        <li>
-          <nuxt-link to="mstreamtpbg">
-            MediaPipe Selfie Segmentationでの実装(MediaStreamTrackProcessor)
-          </nuxt-link>
-        </li>
-        <li>
-          <nuxt-link to="mssegmentationfaframe">
-            MediaPipe Selfie Segmentationでの実装(requestAnimationFrame)
-          </nuxt-link>
-        </li>
-      </ul>
+      <client-only>
+        <MsSegmentationRaframe />
+      </client-only>
     </div>
   </div>
 </template>
 
 <script>
+import MsSegmentationRaframe from '~/components/MsSegmentationRaframe.vue'
+
 export default {
+  components: {
+    MsSegmentationRaframe,
+  },
   data() {
     return {}
   },
-  // created() {},
-  // updated() {},
-  // methods: {},
 }
 </script>
 
