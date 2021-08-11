@@ -1,39 +1,26 @@
 <template>
   <div class="container">
     <div>
-      <h1 class="subtitle">バーチャル背景の実装</h1>
-      <ul>
-        <!-- 仮想の背景をMediaStreamTrackProcessorで実装する -->
-        <li>
-          <nuxt-link to="mstreamtpbg">
-            MediaPipe Selfie Segmentationでの実装(MediaStreamTrackProcessor)
-          </nuxt-link>
-        </li>
-        <li>
-          <nuxt-link to="mssegmentationfaframe">
-            MediaPipe Selfie Segmentationでの実装(requestAnimationFrame)
-          </nuxt-link>
-        </li>
-        <li>
-          <nuxt-link to="bodypix"> BodyPixでの実装 </nuxt-link>
-        </li>
-      </ul>
+      <client-only>
+        <BodyPix />
+      </client-only>
     </div>
   </div>
 </template>
-
 <script>
+import BodyPix from '~/components/BodyPix.vue'
+
 export default {
+  components: {
+    BodyPix,
+  },
   data() {
     return {}
   },
-  // created() {},
-  // updated() {},
-  // methods: {},
 }
 </script>
 
-<style>
+<style scoped>
 .container {
   margin: 0 auto;
   min-height: 100vh;
